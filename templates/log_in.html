@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex flex-column bg-dark" style="width: 100%;">
+    <div class="d-flex p-4">
+        <h2>Log in</h2>
+    </div>
+    <div class="my-1 p-4" style="color: white">
+        <form method="POST" action="/log_in/">
+            <div class="form-group">
+            <label for="exampleInputEmail1">Email address</label>
+            <input type="email" class="form-control" name="email" placeholder="Enter email">
+            </div>
+            <div class="form-group">
+            <label for="exampleInputPassword1">Password</label>
+            <input type="password" class="form-control" name="password" placeholder="Password">
+            </div>
+            <button type="submit" class="btn btn-primary btn-block mt-5">Log In</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

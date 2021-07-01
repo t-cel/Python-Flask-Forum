@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex flex-column bg-dark" style="width: 40%;">
+    <div class="header p-4">
+        <div class="d-flex">
+            <h2>User: {{data.user.name}}</h2>
+        </div>
+        <div class="d-flex p-3">
+            <img src="/static/profiles/{{data.user.id}}.jpg" height="256" width="256"/>
+        </div>
+        <div class="d-flex p-3">
+            Join date: {{data.user.join_date}}
+        </div>
+        {% if data.user.id == data.logged_user_id %}
+        <div class="d-flex pl-3 pd-3">
+            <a href="{{url_for('edit_profile_blueprint.edit_profile')}}">Edit Profile</a>
+        </div>
+        {% endif %}
+        <div class="d-flex p-3">
+            <h5>Questions:</h5>
+        </div>
+        <div class="d-flex pl-3"> 
+            {% if data.questions_data|count > 0 %}      
+            <ul>
+                {% for question_data in data.questions_data %}
+                <li class="small my-1" {% if question_data.has_best %} style="color: rgb(31, 255, 31)" {% endif %}>
+                {%if question_data.votes_sum > 0 %} 
+                    +{{question_data.votes_sum}},
+                {% else %} 
+                    {{question_data.votes_sum}},
+                {% endif %} {{question_data.answers_count}} answers
+                <a href="{{url_for('question_blueprint.question', question_id=question_data.question.id)}}">
+                    {{question_data.question.title}}
+                </a>
+                {{question_data.time}}
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+                This user didn't ask any question yet.
+            {% endif %}
+        </div>
+        <div class="d-flex p-3">
+            <h5>Answers:</h5>
+        </div>
+        <div class="d-flex pl-3"> 
+            {% if data.answers_data|count > 0 %}        
+            <ul>
+                {% for answer_data in data.answers_data %}
+                <li class="small my-1" {% if answer_data.is_best %} style="color: rgb(31, 255, 31)" {% endif %}>
+                {%if answer_data.votes_sum > 0 %} 
+                    +{{answer_data.votes_sum}},
+                {% else %} 
+                    {{answer_data.votes_sum}},
+                {% endif %}
+                <a href="{{url_for('question_blueprint.question', question_id=answer_data.answer.question_id, answer_id=answer_data.answer.id)}}">
+                    {{answer_data.question_title}}
+                </a>
+                {{answer_data.time}}
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+                This user didn't answer any question yet.
+            {% endif %}
+        </div>
+    </div>
+</div>
+<div class="d-flex flex-column bg-dark p-5" style="width: 70%;">
+    <div class="d-flex flex-column" style="border-left: 1px solid rgb(73, 73, 73); width: 100%; height: 100%;">
+        <div class="d-flex mt-4 ml-4">
+            <h2>Description:</h2>
+        </div>
+        <div class="d-flex ml-4">
+            <p>
+                {% if data.user.description %}
+                    {{data.user.description}}
+                {% else %}
+                    This user has no description set.
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

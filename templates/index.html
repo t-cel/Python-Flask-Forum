@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex flex-column  bg-dark" style="width: 100%;">
+    <div class="d-flex p-3">
+        <h2>
+            {% if data.mode == 'categories' %} Categories {% else %} Questions in category: {{data.category_name}} {% endif %}
+        </h2>
+    </div>
+    <div>
+        <div class="p-1">
+            <ul class="list-group">
+                {% if data.mode == 'categories' %}
+                    {% for category_data in data.categories_data %}
+                        <li class="list-group-item text-light m-2" style="background-color: rgb(53, 53, 53);">                         
+                                <h5>
+                                    <a href="{{url_for('home_blueprint.category', category_id=category_data.category.id)}}">{{category_data.category.name}}</a> 
+                                    - {{category_data.questions_count}} Questions
+                                </h5>                           
+                            <p class="small">
+                                {{category_data.category.description}}<br>
+                                {% if category_data.last_question %}
+                                Last Question: 
+                                    <a href="{{url_for('question_blueprint.question', question_id=category_data.last_question.id)}}">{{category_data.last_question.title}}</a>
+                                    by <a href="{{url_for('user_profile_blueprint.user_profile', user_id=category_data.last_question.author_id)}}">{{category_data.last_question_author_name}}</a>, {{category_data.last_question_date}}
+                                {% endif %}
+                            </p>                        
+                        </li>
+                    {% endfor %}
+                {% else %}
+                    {% for question_data in data.questions_data%}
+                        <li class="list-group-item text-light m-2" style="background-color: rgb(53, 53, 53); {% if question_data.has_best %} border-left: 10px solid rgb(31, 255, 31) {% endif %}">
+                            <p class="votes_text">                
+                            {%if question_data.votes_sum > 0 %} 
+                                +{{question_data.votes_sum}} 
+                            {% else %} 
+                                {{question_data.votes_sum}} 
+                            {% endif %}, {{question_data.answers_count}} answers</p>
+                            <a href="{{url_for('question_blueprint.question', question_id=question_data.question.id)}}">
+                                <p class="question_title_text ml-3">{{question_data.question.title}}</p>
+                            </a>
+                            <p class="question_author_text">asked {{question_data.time}} by <a href="{{url_for('user_profile_blueprint.user_profile', user_id=question_data.question.author_id)}}">{{question_data.author_name}}</a></p>
+                        </li>
+                    {% endfor %}
+                {% endif %}
+            </ul>
+
+            {% if data.mode == 'questions' %}
+            <div class="mt-4 mx-2" style="border-bottom: 1px solid rgb(73, 73, 73);"></div>
+            {% endif %}
+        </div>
+
+        {% if data.mode == 'questions' %}
+            {%if data.logged_user_id != -1 %}
+            <div class="p-3 mt-2">
+                <a href="{{url_for('new_question_blueprint.new_question', category_id=data.category_name)}}"><button type="button" class="btn btn-primary btn-block">Ask New Question</button></a>
+            </div>
+            {% else %}
+            <div class="p-3 mt-2 text-center">
+                <a href="{{url_for('log_in_blueprint.log_in')}}"><input type="submit" class="btn btn-primary mr-1 btn-sm" value="Log In"></input></a> Or
+                <a href="{{url_for('sign_up_blueprint.sign_up')}}"><input type="submit" class="btn btn-info btn-sm" value="Sign up"></input></a> To ask new question
+            </div>
+            {% endif %}
+        {% endif %}
+
+    </div>
+</div>
+
+
+{% endblock %}

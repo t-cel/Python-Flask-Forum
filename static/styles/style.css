@@ -1,0 +1,39 @@
+.votes_text{
+    font-size: 0.7vw;
+    display: inline;
+}
+
+.question_title_text{
+    font-size: 1.0vw;
+    display: inline;
+}
+
+.question_author_text{
+    font-size: 0.7vw;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 10px 10px 0px 10px;
+}
+
+.question_content{
+    font-size: 0.9vw;
+}
+
+.header{
+    width: 100%;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding: 10px;
+    color: white;
+}
+
+.footer{
+    min-height: 6vh;
+    margin-top: 5px;
+}
+
+.votes_panel{
+    min-width: 5vw;
+}
+

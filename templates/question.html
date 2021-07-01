@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex flex-column" style="width: 100%;">
+    <div class="header bg-dark">
+        <div class="d-flex p-3">
+            <h2>{{data.question_data.question.title}}</h2>
+        </div>
+        <div class="d-flex flex-row">
+            <div class="p-4 text-center">
+                {% if data.logged_user_id != -1 %}
+                    <button type="button" class="btn btn-primary btn-sm vote_btn_up" id="{{data.question_data.question.id}}">↑</button>
+                {% else %}
+                    <a href="{{url_for('log_in_blueprint.log_in')}}"><button type="button" class="btn btn-primary btn-sm">↑</button></a>
+                {% endif %}
+                <h3  class="post_votes" id="{{data.question_data.question.id}}">
+                    {%if data.question_data.votes_sum > 0 %} 
+                    +{{data.question_data.votes_sum}} 
+                    {% else %} 
+                        {{data.question_data.votes_sum}} 
+                    {% endif %}
+                </h3>
+                {% if data.logged_user_id != -1 %}
+                    <button type="button" class="btn btn-primary btn-sm vote_btn_down" id="{{data.question_data.question.id}}">↓</button>
+                {% else %}
+                    <a href="{{url_for('log_in_blueprint.log_in')}}"><button type="button" class="btn btn-primary btn-sm">↓</button></a>
+                {% endif %}
+            </div>
+            <div class="p-2 mx-4 p-3" style="width:100%; border-bottom: 1px solid rgb(73, 73, 73);">{{data.question_data.question.content}}</div>
+        </div>
+        <div class="d-flex p-3 justify-content-end">
+            <div class="d-flex p-2">
+                <p class="small">Asked {{data.question_data.time}} by <a href="{{url_for('user_profile_blueprint.user_profile', user_id=data.question_data.question.author_id)}}">{{data.question_data.author_name}}</a></p>
+            </div>
+            <div class="d-flex p-2">
+                <img src="/static/profiles/{{data.question_data.question.author_id}}.jpg" height="64" width="64"/>
+            </div>
+        </div>
+    </div>
+
+    {% for answer_data in data.answers_data %}
+    <div id="{{answer_data.answer.id}}" class="bg-dark my-2" style="color: white; {% if answer_data.answer.is_best %} border-left: 10px solid rgb(31, 255, 31) {% endif %}">
+        <div class="d-flex flex-row">
+            <div class="p-4 text-center">
+
+                {% if not data.has_best and data.logged_user_id == data.question_data.question.author_id  %}                
+                <a href="{{url_for('question_blueprint.mark_best', answer_id=answer_data.answer.id)}}"><button type="button" class="btn btn-success btn-sm my-3">✓</button></a>
+                {% endif %}
+
+                {% if answer_data.answer.is_best %}
+                <a href="#"><button type="button" class="btn btn-success btn-sm my-3" disabled>✓</button></a>
+                {% endif %}
+
+                {% if data.logged_user_id != -1 %}
+                    <button type="button" class="btn btn-primary btn-sm vote_btn_up" id="{{answer_data.answer.id}}">↑</button>
+                {% else %}
+                    <a href="{{url_for('log_in_blueprint.log_in')}}"><button type="button" class="btn btn-primary btn-sm">↑</button></a>
+                {% endif %}
+                <h3 class="post_votes" id="{{answer_data.answer.id}}">
+                    {%if answer_data.votes_sum > 0 %} 
+                    +{{answer_data.votes_sum}} 
+                    {% else %} 
+                        {{answer_data.votes_sum}} 
+                    {% endif %}
+                </h3>
+                {% if data.logged_user_id != -1 %}
+                    <button type="button" class="btn btn-primary btn-sm vote_btn_down" id="{{answer_data.answer.id}}">↓</button>
+                {% else %}
+                    <a href="{{url_for('log_in_blueprint.log_in')}}"><button type="button" class="btn btn-primary btn-sm">↓</button></a>
+                {% endif %}
+            </div>
+            <div class="mx-4 p-3" style="width:100%; border-bottom: 1px solid rgb(73, 73, 73);">{{answer_data.answer.content}}</div>
+        </div>
+        <div class="d-flex p-3 justify-content-end">
+            <div class="d-flex p-2">
+                <p class="small">Answered {{answer_data.time}} By <a href="{{url_for('user_profile_blueprint.user_profile', user_id=answer_data.answer.author_id)}}">{{answer_data.answer.author.name}}</a></p>
+            </div>
+            <div class="d-flex p-2">
+                <img src="/static/profiles/{{answer_data.answer.author_id}}.jpg" height="64" width="64"/>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="bg-dark my-2 p-4" style="color: white">
+        {%if data.logged_user_id != -1 %}
+        <form method="POST" action="/question/">
+            <div class="d-flex">
+                <h5>Write your answer:</h5>
+            </div>
+            <div class="d-flex mt-4">
+                <textarea name="answer" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="d-flex mt-4">
+                <input type="submit" value="Answer" class="btn btn-primary btn-block"/>
+            </div>
+            <input type="hidden" name="question_id" value="{{data.question_data.question.id}}">
+        </form>
+        {% else %}
+        <div class="p-2 mt-1 text-center">
+            <a href="{{url_for('log_in_blueprint.log_in')}}"><input type="submit" class="btn btn-primary mr-1 btn-sm" value="Log In"></input></a> Or
+            <a href="{{url_for('sign_up_blueprint.sign_up')}}"><input type="submit" class="btn btn-info btn-sm" value="Sign up"></input></a> To answer
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script type=text/javascript>
+    $SCRIPT_ROOT = {{ request.script_root|tojson }};
+    
+    $('.vote_btn_up').click(function(){
+        onVote($(this).attr('id'), 1);
+    })
+
+    $('.vote_btn_down').click(function() {
+        onVote($(this).attr('id'), 0);       
+    })
+    
+    function onVote(post_id, up){
+        $.getJSON($SCRIPT_ROOT + '/vote', {
+                post_id: post_id,
+                up: up
+            })
+            .done(function(data){
+                if(data.result == "#1")
+                {
+                    alert("You can't vote your own post");
+                    return;
+                }
+                
+                if(data.result == "#2")
+                {
+                    alert("You already voted this post");
+                    return;
+                }
+                
+                asInt = parseInt(data.result);
+                $('#'+post_id+'.post_votes').text(asInt < 0 ? asInt.toString() : '+' + asInt.toString());
+            });
+    }
+
+    {% if data.answer_id %}
+    $(document).ready(function(){
+        window.location.href = '#' + {{data.answer_id}};
+    });
+    {% endif %}
+
+</script>
+
+{% endblock %}
