@@ -21,3 +21,11 @@ It allows to create accounts, questions for specific categories, answers, voting
  - profile - view containing informations about some user such as asked questions and posted answers. User can have own picture and description.
  - edit_profile - edit profile form, fields are optional, user changes only things he want to change.
  - new_question
+
+# Screenshots
+
+![](1.png)
+#
+![](2.png)
+#
+![](3.png) 
